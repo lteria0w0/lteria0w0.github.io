@@ -166,19 +166,19 @@
 <p>使用pandas来进行数据分析</p>
 <p>列表可以通过 n + 1  for n in numbers if test   实现</p>
 <p>字典可以通过 new_key : new_value for (key,value) in dict</p>
-</details></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-08-24T04:01:54.000Z" title="2022/8/24 12:01:54">2022-08-24</time>发表</span><span class="level-item"><time dateTime="2022-08-24T04:02:59.807Z" title="2022/8/24 12:02:59">2022-08-24</time>更新</span><span class="level-item">9 分钟读完 (大约1276个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2022/08/24/js%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">js基础知识</a></h1><div class="content"><h3 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h3><blockquote>
+</details></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-08-24T04:01:54.000Z" title="2022/8/24 12:01:54">2022-08-24</time>发表</span><span class="level-item"><time dateTime="2022-10-06T07:04:37.443Z" title="2022/10/6 15:04:37">2022-10-06</time>更新</span><span class="level-item">9 分钟读完 (大约1289个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2022/08/24/js%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">js基础知识</a></h1><div class="content"><h3 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h3><blockquote>
 <p>prettier插件：下载后前往 default formatter 配置（最好开启 format on save），通过.prettier进行配置<br>todo Hightlight高亮某些部分（需要以json格式打开setting配置）<br>安装node.js live-server（win11 禁止脚本）<br>谷歌debug可以尝试使用<br>可以使用console.table()来展示对象信息&#96;&#96;&#96;</p>
 </blockquote>
 <details>
 <summary>详情</summary>
 
-<h3 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h3><p>七大基本类型（通过typeof进行配型判断）</p>
+<h2 id="1-基础知识"><a href="#1-基础知识" class="headerlink" title="1. 基础知识"></a>1. 基础知识</h2><p>七大基本类型（通过typeof进行配型判断）</p>
 <blockquote>
 <p>number：数字<br>string：字符串<br>undefined：未定义<br>null：无值（用控制台打印出是 object）<br>boolean：布尔值<br>object：对象<br>symbol：独一无二值</p>
 </blockquote>
 <p>三大变量创建方法</p>
 <blockquote>
-<p>var：老式<br>let：新式<br>const：不改变的值</p>
+<p>var：老式–函数作用域<br>let：新式–块作用域<br>const：不改变的值–块作用域</p>
 </blockquote>
 <p>可以使用js的严格模式，帮助自动调整格式，且更详细的检查错误</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br></pre></td></tr></table></figure>
@@ -198,7 +198,7 @@
 <p>Math的方法</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Math</span>.<span class="title function_">random</span>()<span class="comment">//获取随机数</span></span><br><span class="line"><span class="title class_">Math</span>.<span class="title function_">trunc</span>()<span class="comment">//取整</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="js引擎"><a href="#js引擎" class="headerlink" title="js引擎"></a>js引擎</h3><p>三大范式：面向过程，函数式，面向对象</p>
+<h2 id="2-js引擎"><a href="#2-js引擎" class="headerlink" title="2. js引擎"></a>2. js引擎</h2><p>三大范式：面向过程，函数式，面向对象</p>
 <p>非阻塞模型：可以异步或者多线程执行</p>
 <p>现在基本上没有语言是纯解释或者纯编译了</p>
 <p>jsweb由三部分组成，js引擎（堆栈）；webapis；回调函数。正式因为如此，js可以脱离浏览器运行，之所以能在浏览器上运行，仅仅是因为其调用了webapi</p>
