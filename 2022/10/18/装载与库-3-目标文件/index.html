@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>装载与库-3-目标文件 - lteria0w0&#039;s blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="lteria0w0"><meta name="msapplication-TileImage" content="/img/s.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="lteria0w0"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="详情   1. 目标文件格式目标文件：编译器编译源代码后产生的文件（结构上为可执行文件，还未进行链接） 常见格式 1P56-P57  2. 目标文件结构存储方式：目标文件通常讲信息按不同的类型，以“节”&amp;#x2F;“段”的形式存储 1234文件头：描述整个文件的属性，具有描述各个段信息的段表代码段：程序源代码编译后的机器指令存放位置；常见格式“.code”，“.text”数据段：全局变量和局部静"><meta property="og:type" content="blog"><meta property="og:title" content="装载与库-3-目标文件"><meta property="og:url" content="http://example.com/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-3-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6/"><meta property="og:site_name" content="lteria0w0&#039;s blog"><meta property="og:description" content="详情   1. 目标文件格式目标文件：编译器编译源代码后产生的文件（结构上为可执行文件，还未进行链接） 常见格式 1P56-P57  2. 目标文件结构存储方式：目标文件通常讲信息按不同的类型，以“节”&amp;#x2F;“段”的形式存储 1234文件头：描述整个文件的属性，具有描述各个段信息的段表代码段：程序源代码编译后的机器指令存放位置；常见格式“.code”，“.text”数据段：全局变量和局部静"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-c.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-size.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-s-d.png"><meta property="og:image" content="http://example.com/(https:/a-1305034225.cos.ap-chengdu.myqcloud.com/bj/asd-o.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-header.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-section.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/sym-tab.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SpecialSymbol-c.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SpecialSymbol-run.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/fun-t.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/thread-test.png"><meta property="og:image" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/pthread-thread.png"><meta property="article:published_time" content="2022-10-18T06:01:49.000Z"><meta property="article:modified_time" content="2022-10-18T06:13:04.477Z"><meta property="article:author" content="lteria0w0"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-c.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-3-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6/"},"headline":"装载与库-3-目标文件","image":["https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-c.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-size.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-s-d.png","http://example.com/(https:/a-1305034225.cos.ap-chengdu.myqcloud.com/bj/asd-o.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-header.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-section.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/sym-tab.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SpecialSymbol-c.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SpecialSymbol-run.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/fun-t.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/thread-test.png","https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/pthread-thread.png"],"datePublished":"2022-10-18T06:01:49.000Z","dateModified":"2022-10-18T06:13:04.477Z","author":{"@type":"Person","name":"lteria0w0"},"publisher":{"@type":"Organization","name":"lteria0w0's blog","logo":{"@type":"ImageObject","url":"http://example.com/img/htg.png"}},"description":"详情   1. 目标文件格式目标文件：编译器编译源代码后产生的文件（结构上为可执行文件，还未进行链接） 常见格式 1P56-P57  2. 目标文件结构存储方式：目标文件通常讲信息按不同的类型，以“节”&#x2F;“段”的形式存储 1234文件头：描述整个文件的属性，具有描述各个段信息的段表代码段：程序源代码编译后的机器指令存放位置；常见格式“.code”，“.text”数据段：全局变量和局部静"}</script><link rel="canonical" href="http://example.com/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-3-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6/"><link rel="icon" href="/img/s.png"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><script data-ad-client="1" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" async></script><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+          Array
+              .from(document.querySelectorAll('.tab-content'))
+              .forEach($tab => {
+                  $tab.classList.add('is-hidden');
+              });
+          Array
+              .from(document.querySelectorAll('.tabs li'))
+              .forEach($tab => {
+                  $tab.classList.remove('is-active');
+              });
+          const $activeTab = document.querySelector(location.hash);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+          const $tabMenu = document.querySelector(`a[href="${location.hash}"]`);
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.2.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/htg.png" alt="lteria0w0&#039;s blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/lteria0w0"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-10-18T06:01:49.000Z" title="2022/10/18 14:01:49">2022-10-18</time>发表</span><span class="level-item"><time dateTime="2022-10-18T06:13:04.477Z" title="2022/10/18 14:13:04">2022-10-18</time>更新</span><span class="level-item">13 分钟读完 (大约1877个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">装载与库-3-目标文件</h1><div class="content"><details>
+<summary>详情</summary>
+
+
+<h2 id="1-目标文件格式"><a href="#1-目标文件格式" class="headerlink" title="1. 目标文件格式"></a>1. 目标文件格式</h2><p>目标文件：编译器编译源代码后产生的文件（结构上为可执行文件，还未进行链接）</p>
+<p>常见格式</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P56-P57</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-目标文件结构"><a href="#2-目标文件结构" class="headerlink" title="2. 目标文件结构"></a>2. 目标文件结构</h2><p>存储方式：目标文件通常讲信息按不同的类型，以“节”&#x2F;“段”的形式存储</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">文件头：描述整个文件的属性，具有描述各个段信息的段表</span><br><span class="line">代码段：程序源代码编译后的机器指令存放位置；常见格式“.code”，“.text”</span><br><span class="line">数据段：全局变量和局部静态变量数据存放位置；常见格式“.data”</span><br><span class="line">预留段：未初始化的全局变量，局部变量的预留位置；常见格式：“.bss”</span><br></pre></td></tr></table></figure>
+<p><small style="color:orange;">程序源代码被编译后分为：程序指令和程序数据</small></p>
+<p>讲指令数据分开存放的好处</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">便于权限管理：指令只读，数据可读可写</span><br><span class="line">便于缓存：cpu通过数据和指令的缓存分离实现高命中率</span><br><span class="line">便于共享：多程序可能共享同一个指令或者数据</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-操作目标文件"><a href="#3-操作目标文件" class="headerlink" title="3. 操作目标文件"></a>3. 操作目标文件</h2><p>创建SimpleSection.c文件<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-c.png" alt="image"></p>
+<p>通过gcc来编译</p>
+<blockquote>
+<p>gcc -c SimpleSection.c</p>
+</blockquote>
+<p>通过objdump指令来查看结构（-h参数即是讲基本信息打印出来；-x可以打印更多信息）</p>
+<blockquote>
+<p>objdump -h SimpleSection.o</p>
+</blockquote>
+<p>可以看到（File off表示段底部地址）（书中段是向上增长的）<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o.png" alt="image"><br><small style="color:orange;">从上至下依次为：代码段，数据段，预留段，只读数据段，注释信息段，堆栈提示段</small></p>
+<p>段属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONTENTS：该段在文件中存在</span><br></pre></td></tr></table></figure>
+
+<p>通过size指令查看各个段长度</p>
+<blockquote>
+<p>size SimpleSection.o</p>
+</blockquote>
+<p>可得到<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-size.png" alt="image"></p>
+<p>可以通过-s参数将所有信息以16进制打印，-d参数将所有包含指令的段反汇编</p>
+<blockquote>
+<p>objdump -s -d SimpleSection.o</p>
+</blockquote>
+<p>可以得到<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-s-d.png" alt="image"><br><small style="color:orange;">16进制下，两位等于一个字节</small></p>
+<p>可以明显地看到，各段16字节显示长度均和size指令相等（除了.text段）</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">size默认是运行在&quot;Berkeley compatibility mode&quot;下。在这种模式下，会将不可执行的拥有&quot;ALLOC&quot;属性的只读段归到.text段下，很典型的就是.rodata段。如果你使用参数-A，那么size会运行在&quot;System V compatibility mode&quot;，此时，用objdump -h和size显示的.text段大小就差不多了</span><br></pre></td></tr></table></figure>
+
+<p>根据代码具体剖析各常用段大小</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.data：初始化的全局静态变量和局部静态变量，两个int类型，共8字节</span><br><span class="line">.rodata：保存只读数据，printf函数所使用的字符串常量</span><br><span class="line">.bss：存放未初始化的全局变量和局部变量，仅有四个字节（可通过后面符号表具体查看），仅仅是预留了空间，链接时在分配</span><br></pre></td></tr></table></figure>
+
+<p>其他段信息</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P67</span><br></pre></td></tr></table></figure>
+
+<p>小问题：分析下面两个变量分配的空间</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> x1 = <span class="number">0</span>; <span class="comment">//.bss---0默认为未分配</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> x2 = <span class="number">1</span>; <span class="comment">//.data</span></span><br></pre></td></tr></table></figure>
+
+<p>将图片转化为2进制文件</p>
+<blockquote>
+<p>objcopy -I binary -O elf32-i386 -B i386 asd.jpg asd.o</p>
+</blockquote>
+<p>查看转化后的2进制文件</p>
+<blockquote>
+<p>objdump -ht asd.o</p>
+</blockquote>
+<p>可以看到<br><img src="/(https:/a-1305034225.cos.ap-chengdu.myqcloud.com/bj/asd-o.png" alt="image"><br><small style="color:orange;">.data段分别表示了图片的开始地址，结束地址，长度</small></p>
+<p>可以通过以下方式指定变量所处的段</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__attribute__((section(<span class="string">&quot;FOO&quot;</span>))) <span class="type">int</span> global = <span class="number">42</span>;</span><br><span class="line">__attribute__((section(<span class="string">&quot;BAR&quot;</span>))) <span class="type">void</span> <span class="title function_">foo</span><span class="params">()</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p><small style="color:orange;">在全局变量或函数之前加上”<strong>attribute</strong>((section(“name”)))”就可以将其放到以name为名的段中</small></p>
+<h2 id="4-ELF文件结构"><a href="#4-ELF文件结构" class="headerlink" title="4. ELF文件结构"></a>4. ELF文件结构</h2><p>ELF总体结构</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P69</span><br></pre></td></tr></table></figure>
+
+<p>文件头：处于ELF目标文件格式的最前部，包含了描述整个文件的基本属性；<br>段表：描述了文件所有包含段的信息</p>
+<p>使用如下命令查看文件头</p>
+<blockquote>
+<p>readelf -h SimpleSection.o</p>
+</blockquote>
+<p>效果如下<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-header.png" alt="image"><br><small style="color:orange;">其中包含了ELF魔数，文件机器字节长度，存储方式</small></p>
+<p>具体含义：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P71-P72</span><br></pre></td></tr></table></figure>
+
+<p>魔数16字节：识别码（4）+ 文件类（1）+ 字节序（1）+ 版本号（1）+ 未定义（9）</p>
+<p>查看段表结构</p>
+<blockquote>
+<p>readelf -S SimpleSection.o</p>
+</blockquote>
+<p>效果如下<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SimpleSection-o-section.png" alt="image"><br><small style="color:orange;">不同于objudmp，显示了完整的段结构</small></p>
+<p>由此可知，所有段的具体位置（段名称仅仅在编译的时候有意义）</p>
+<h2 id="5-符号"><a href="#5-符号" class="headerlink" title="5. 符号"></a>5. 符号</h2><p>函数和变量统称为符号；变量名和函数名统称为符号名，由符号表保存相关信息；符号值即是地址</p>
+<p><small style="color:orange;">符号表通常是一个段 .symtab</small></p>
+<p>相关特征：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">定义在本文件全局符号可以被其他文件引用</span><br><span class="line">在本目标文件中定义的全局符号，却没有定义在本文件中，称为外部符号</span><br><span class="line">段名：通常由编译器产生</span><br><span class="line">局部符号：只在单元内可见</span><br><span class="line">行号信息：目标文件指令与源代码之间的关系</span><br></pre></td></tr></table></figure>
+
+<p>使用如下指令查看目标文件</p>
+<blockquote>
+<p>nm SimpleSection.o</p>
+</blockquote>
+<p>得到结果<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/sym-tab.png" alt="image"></p>
+<p>符号值</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">偏移</span><br><span class="line">对齐</span><br><span class="line">虚拟地址</span><br></pre></td></tr></table></figure>
+
+<p>查看详细信息</p>
+<blockquote>
+<p>readelf -s SimpleSection.o</p>
+</blockquote>
+<p>创建文件SpecialSymbol.c<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SpecialSymbol-c.png" alt="image"></p>
+<p>编译并执行</p>
+<blockquote>
+<p>gcc SpecialSymbol.c -o SpecialSymbol<br>.&#x2F;SpecialSymbol</p>
+</blockquote>
+<p>便可通过特殊符号获得相应地址<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/SpecialSymbol-run.png" alt="image"></p>
+<p>命名空间：为了解决当项目过大时，符号名称相同的问题（取代了对函数添加__的操作）所产生的解决方法；而对于C++等具有重载等复杂性质的语言，又诞生出了符号修饰，符号改编等机制</p>
+<p>可以通过如下指令解析修饰后的名称</p>
+<blockquote>
+<p>c++filt</p>
+</blockquote>
+<p>得到结果<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/fun-t.png" alt="image"></p>
+<p>强符号：函数和初始化全局变量<br>弱符号：未初始化的全局变量<br>（可以自己通过__attribute__((weak))）来定义弱符号</p>
+<p>规则</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">不允许强符号被多次定义</span><br><span class="line">一个目标文件中强符号优先级大于其他文件弱符号</span><br><span class="line">弱符号中选择占用空间最大的</span><br></pre></td></tr></table></figure>
+
+<p>两个引用规则</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">强引用：对于未定义错误选择报错</span><br><span class="line">弱引用：对于未定义错误选择不报错，赋予默认值</span><br></pre></td></tr></table></figure>
+<p>（可以通过__attribute__((weakref))修饰符来声明为弱引用）</p>
+<p>弱符号和弱引用的作用</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">弱符号可以被强符号覆盖</span><br><span class="line">弱引用使得缺少功能模块时可以正常链接，只是缺少相应功能</span><br></pre></td></tr></table></figure>
+
+<p>通过以下代码来查看c语言线程方面的弱引用的使用<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/thread-test.png" alt="image"></p>
+<p>以链接和不链接方式分别运行</p>
+<blockquote>
+<p>gcc pthread.c -o pt<br>.&#x2F;pt</p>
+</blockquote>
+<blockquote>
+<p>gcc pthread.c -lpthread -o pt<br>.&#x2F;pt</p>
+</blockquote>
+<p>结果如下<br><img src="https://a-1305034225.cos.ap-chengdu.myqcloud.com/bj/pthread-thread.png" alt="image"></p>
+<h2 id="6-调试"><a href="#6-调试" class="headerlink" title="6. 调试"></a>6. 调试</h2><p>通过如下指令关闭调试信息</p>
+<blockquote>
+<p>strip foo</p>
+</blockquote>
+</details></div><div class="article-licensing box"><div class="licensing-title"><p>装载与库-3-目标文件</p><p><a href="http://example.com/2022/10/18/装载与库-3-目标文件/">http://example.com/2022/10/18/装载与库-3-目标文件/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>lteria0w0</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2022-10-18</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2022-10-18</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="sharethis-inline-share-buttons"></div><script src="/" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" href="/" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>爱发电</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/" alt="支付宝"></span></a><a class="button donate" href="/" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>送我杯咖啡</span></a><a class="button donate" href="/" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><a class="button donate" data-type="paypal" onclick="document.getElementById(&#039;paypal-donate-form&#039;).submit()"><span class="icon is-small"><i class="fab fa-paypal"></i></span><span>Paypal</span></a><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" rel="noopener" id="paypal-donate-form"><input type="hidden" name="cmd" value="_donations"><input type="hidden" name="business" value="1633043198@qq.com"><input type="hidden" name="currency_code" value="USD"></form><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-2-%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">装载与库-2-编译和链接</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2022/10/07/css%E4%BB%8B%E7%BB%8D/"><span class="level-item">css介绍</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script>var disqus_config = function () {
+            this.page.url = 'http://example.com/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-3-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6/';
+            this.page.identifier = '2022/10/18/装载与库-3-目标文件/';
+        };
+        (function() {
+            var d = document, s = d.createElement('script');  
+            s.src = '//' + 'lteria0w0' + '.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.png" alt="lteria0w0"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">lteria0w0</p><p class="is-size-6 is-block">zood的粉丝</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>四川成都</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">12</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">0</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">1</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/ppoffice" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="/"><i class="fas fa-rss"></i></a></div></div></div><!--!--><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">链接</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-10-18T06:15:24.000Z">2022-10-18</time></p><p class="title"><a href="/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-1-%E7%AE%80%E4%BB%8B/">装载与库-1-简介</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-10-18T06:14:27.000Z">2022-10-18</time></p><p class="title"><a href="/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-2-%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/">装载与库-2-编译和链接</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-10-18T06:01:49.000Z">2022-10-18</time></p><p class="title"><a href="/2022/10/18/%E8%A3%85%E8%BD%BD%E4%B8%8E%E5%BA%93-3-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6/">装载与库-3-目标文件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-10-07T02:55:45.000Z">2022-10-07</time></p><p class="title"><a href="/2022/10/07/css%E4%BB%8B%E7%BB%8D/">css介绍</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-10-07T02:01:58.000Z">2022-10-07</time></p><p class="title"><a href="/2022/10/07/html%E4%BB%8B%E7%BB%8D/">html介绍</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2022/10/"><span class="level-start"><span class="level-item">十月 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/08/"><span class="level-start"><span class="level-item">八月 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%AC%94%E8%AE%B0/"><span class="tag">设计模式笔记</span><span class="tag">1</span></a></div></div></div></div></div><div class="card widget" data-type="subscribe-email"><div class="card-content"><div class="menu"><h3 class="menu-label">订阅更新</h3><form action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open(&#039;https://feedburner.google.com/fb/a/mailverify?uri=&#039;,&#039;popupwindow&#039;,&#039;scrollbars=yes,width=550,height=520&#039;);return true"><input type="hidden" value="" name="uri"><input type="hidden" name="loc" value="en_US"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button" type="submit" value="订阅"></div></div></form></div></div></div><div class="card widget" data-type="adsense"><div class="card-content"><div class="menu"><h3 class="menu-label">广告</h3><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><ins class="adsbygoogle" style="display:block" data-ad-client="1" data-ad-slot="1" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div></div></div><div class="card widget" data-type="subscribe-email"><div class="card-content"><div class="menu"><h3 class="menu-label">follow.it</h3><form action="" method="post" target="_blank"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button" type="submit" value="订阅"></div></div></form></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/htg.png" alt="lteria0w0&#039;s blog" height="28"></a><p class="is-size-7"><span>&copy; 2022 lteria0w0</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/lteria0w0"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
